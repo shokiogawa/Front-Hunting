@@ -1,0 +1,8 @@
+import 'package:demo_flutter_project/models/db/practice/tables/dao_query.dart';
+
+
+
+
+allCategoryRecords: SELECT * FROM category_records;
+allMainAndSubCategory: SELECT * FROM sub_category_records INNER JOIN category_records on sub_category_records.category_id = category_records.id;
+
