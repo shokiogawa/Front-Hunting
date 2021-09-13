@@ -1,0 +1,26 @@
+name: unit-test
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches:
+      - develop
+
+jobs:
+  unit_test:
+    name: flutter unit test
+    runs-on: ubuntu-latest
+    steps:
+      - name: set up repository
+        uses: actions/chekout@v2
+      - name: set up java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '12.x'
+      - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '2.2.3'
+          channel: 'stable'
+      - run: flutter pub get
+      - run: flutter test
