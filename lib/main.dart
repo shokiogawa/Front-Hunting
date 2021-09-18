@@ -29,7 +29,7 @@ class MyApp extends HookConsumerWidget {
     final _homeViewModel = ref.read(homeViewModelProvider);
     final _future = useMemoized(() async => await _homeViewModel.gatIsPassT());
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'JOB HUNTING',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
