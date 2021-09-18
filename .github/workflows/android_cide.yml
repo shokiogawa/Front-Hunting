@@ -1,11 +1,10 @@
 name: android_cicd
 
 on:
-  pull_request:
-    types: [opened, synchronize]
-  push:
-    branches:
-      - develop
+  release:
+    types:
+      - created
+
 jobs:
   build:
     runs-on: ubuntu-latest
