@@ -1,0 +1,46 @@
+name: android_cicd
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches:
+      - develop
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: set up repository
+        uses: actions/checkout@v2
+      - name: Translate secrets po base64 into json
+        env:
+          GOOGLE_SERVICE: ${{ secrets.ANDROID_GOOGLE_SERVICE }}
+        run:
+          echo $GOOGLE_SERVICE | base64 --decode > ./android/app/google-services.json
+
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: 'stable'
+      - name: flutter pub get
+        run: flutter pub get
+
+      - name: create key.properties
+        run: |
+          echo ${{ secrets.ANDROID_KEY_JKS }} | base64 -d > android/app/key.jks
+          echo 'storeFile=key.jks' > android/keystore.properties
+          echo 'storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}' >> android/keystore.properties
+          echo 'keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}' >> android/keystore.properties
+          echo 'keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}' >> android/keystore.properties
+
+      - name: Build APK
+        run: flutter build apk --release --build-number=$GITHUB_RUN_NUMBER
+
+      - name: Upload apk to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1.3.2
+        with:
+          appId: ${{secrets.FIREBASE_ANDROID_APP_ID}}
+          token: ${{secrets.FIREBASE_APP_TOKEN}}
+          groups: company
+          file: ./build/app/outputs/apk/release/app-release.apk
